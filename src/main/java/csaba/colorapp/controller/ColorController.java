@@ -6,7 +6,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Text;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -42,8 +41,6 @@ public class ColorController implements Initializable {
     private Rectangle matchingColor4;
     @FXML
     private Rectangle matchingColor5;
-    @FXML
-    private Text matchingColorHex;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -58,11 +55,23 @@ public class ColorController implements Initializable {
         blueValueField.setText(String.valueOf(color.getBlue()));
         generateColors();
 
-        matchingColor1.setOnMouseClicked(mouseEvent -> matchingColorHex.setText(matchingColor1.getFill().toString()));
+        addMatchingColorListener(matchingColor1);
+        addMatchingColorListener(matchingColor2);
+        addMatchingColorListener(matchingColor3);
+        addMatchingColorListener(matchingColor4);
+        addMatchingColorListener(matchingColor5);
 
         bindSliderTextFieldHexField(redSlider, redValueField, color::setRed, color::getRed);
         bindSliderTextFieldHexField(greenSlider, greenValueField, color::setGreen, color::getGreen);
         bindSliderTextFieldHexField(blueSlider, blueValueField, color::setBlue, color::getBlue);
+    }
+
+    private void addMatchingColorListener(Rectangle matchingColorRectangle) {
+        matchingColorRectangle.setOnMouseClicked(mouseEvent -> {
+            javafx.scene.paint.Color c = (javafx.scene.paint.Color) matchingColorRectangle.getFill();
+            Color c1 = new Color((int) (c.getRed() * 255), (int) (c.getGreen() * 255), (int) (c.getBlue() * 255));
+            colorRectangle.setFill(javafx.scene.paint.Color.rgb(c1.getRed(), c1.getGreen(), c1.getBlue()));
+        });
     }
 
     private void bindSliderTextFieldHexField(Slider slider, TextField textField, Consumer<Integer> setMethod, IntSupplier getMethod) {
@@ -83,6 +92,15 @@ public class ColorController implements Initializable {
         hexValueField.textProperty().addListener((observable, oldValue, newValue) -> {
             try {
                 color.setHexValue(newValue);
+                slider.setValue(getMethod.getAsInt());
+            } catch (IllegalArgumentException ignored) {
+            }
+        });
+        colorRectangle.fillProperty().addListener((observable, oldValue, newValue) -> {
+            try {
+                javafx.scene.paint.Color c = (javafx.scene.paint.Color) newValue;
+                Color c1 = new Color((int) (c.getRed() * 255), (int) (c.getGreen() * 255), (int) (c.getBlue() * 255));
+                color.setHexValue(c1.getHexValue());
                 slider.setValue(getMethod.getAsInt());
             } catch (IllegalArgumentException ignored) {
             }
