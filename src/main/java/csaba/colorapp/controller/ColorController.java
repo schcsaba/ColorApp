@@ -6,6 +6,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -41,6 +42,8 @@ public class ColorController implements Initializable {
     private Rectangle matchingColor4;
     @FXML
     private Rectangle matchingColor5;
+    @FXML
+    private Text matchingColorHex;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -53,7 +56,9 @@ public class ColorController implements Initializable {
         redValueField.setText(String.valueOf(color.getRed()));
         greenValueField.setText(String.valueOf(color.getGreen()));
         blueValueField.setText(String.valueOf(color.getBlue()));
-        colorRectangle.setFill(javafx.scene.paint.Color.rgb(color.getRed(), color.getGreen(), color.getBlue()));
+        generateColors();
+
+        matchingColor1.setOnMouseClicked(mouseEvent -> matchingColorHex.setText(matchingColor1.getFill().toString()));
 
         bindSliderTextFieldHexField(redSlider, redValueField, color::setRed, color::getRed);
         bindSliderTextFieldHexField(greenSlider, greenValueField, color::setGreen, color::getGreen);
@@ -66,20 +71,14 @@ public class ColorController implements Initializable {
             textField.setText(String.valueOf(intValue));
             setMethod.accept(intValue);
             hexValueField.setText(color.getHexValue());
-            colorRectangle.setFill(javafx.scene.paint.Color.rgb(color.getRed(), color.getGreen(), color.getBlue()));
-            Color[] matchingColors = generateMatchingColors(color, 5);
-            matchingColor1.setFill(javafx.scene.paint.Color.rgb(matchingColors[0].getRed(), matchingColors[0].getGreen(), matchingColors[0].getBlue()));
-            matchingColor2.setFill(javafx.scene.paint.Color.rgb(matchingColors[1].getRed(), matchingColors[1].getGreen(), matchingColors[1].getBlue()));
-            matchingColor3.setFill(javafx.scene.paint.Color.rgb(matchingColors[2].getRed(), matchingColors[2].getGreen(), matchingColors[2].getBlue()));
-            matchingColor4.setFill(javafx.scene.paint.Color.rgb(matchingColors[3].getRed(), matchingColors[3].getGreen(), matchingColors[3].getBlue()));
-            matchingColor5.setFill(javafx.scene.paint.Color.rgb(matchingColors[4].getRed(), matchingColors[4].getGreen(), matchingColors[4].getBlue()));
+            generateColors();
         });
         textField.textProperty().addListener((observable, oldValue, newValue) -> {
             try {
                 slider.setValue(Double.parseDouble(newValue));
             } catch (IllegalArgumentException illegalArgumentException) {
                 slider.setValue(0.0);
-            };
+            }
         });
         hexValueField.textProperty().addListener((observable, oldValue, newValue) -> {
             try {
@@ -88,6 +87,16 @@ public class ColorController implements Initializable {
             } catch (IllegalArgumentException ignored) {
             }
         });
+    }
+
+    private void generateColors() {
+        colorRectangle.setFill(javafx.scene.paint.Color.rgb(color.getRed(), color.getGreen(), color.getBlue()));
+        Color[] matchingColors = generateMatchingColors(color, 5);
+        matchingColor1.setFill(javafx.scene.paint.Color.rgb(matchingColors[0].getRed(), matchingColors[0].getGreen(), matchingColors[0].getBlue()));
+        matchingColor2.setFill(javafx.scene.paint.Color.rgb(matchingColors[1].getRed(), matchingColors[1].getGreen(), matchingColors[1].getBlue()));
+        matchingColor3.setFill(javafx.scene.paint.Color.rgb(matchingColors[2].getRed(), matchingColors[2].getGreen(), matchingColors[2].getBlue()));
+        matchingColor4.setFill(javafx.scene.paint.Color.rgb(matchingColors[3].getRed(), matchingColors[3].getGreen(), matchingColors[3].getBlue()));
+        matchingColor5.setFill(javafx.scene.paint.Color.rgb(matchingColors[4].getRed(), matchingColors[4].getGreen(), matchingColors[4].getBlue()));
     }
 
     private static Color[] generateMatchingColors(Color startingColor, int numColors) {
